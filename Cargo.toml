@@ -1,0 +1,19 @@
+[package]
+name = "mixnet_perf_probe"
+version = "0.1.0"
+edition = "2024"
+license = "AGPL-3.0-only"
+description = "Measures Pigeonhole box read and write performance on a Katzenpost mixnet"
+repository = "https://github.com/katzenpost/mixnet_perf_probe"
+
+[dependencies]
+katzenpost_thin_client = { git = "https://github.com/katzenpost/thin_client", rev = "ae3dec70f230f99a07db201dd16d66abb5a9600e" }
+axum = "0.8"
+blake2 = "0.10"
+clap = { version = "4", features = ["derive"] }
+env_logger = "0.11"
+humantime = "2"
+log = "0.4"
+prometheus-client = "0.23"
+rand = "0.8"
+tokio = { version = "1", features = ["full"] }

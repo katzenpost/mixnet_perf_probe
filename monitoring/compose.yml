@@ -1,0 +1,40 @@
+# Prometheus and Grafana for mixnet_perf_probe and kpclientd.
+#   cd monitoring && podman-compose up -d
+# Grafana: http://127.0.0.1:3000  Prometheus: http://127.0.0.1:9090
+services:
+  prometheus:
+    image: docker.io/prom/prometheus:v3.5.0
+    network_mode: host
+    restart: unless-stopped
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+      - --storage.tsdb.path=/prometheus
+      - --storage.tsdb.retention.time=90d
+      - --web.listen-address=127.0.0.1:9090
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro,Z
+      - prometheus-data:/prometheus
+
+  grafana:
+    image: docker.io/grafana/grafana:12.1.1
+    network_mode: host
+    restart: unless-stopped
+    environment:
+      GF_SERVER_HTTP_ADDR: 127.0.0.1
+      GF_SERVER_HTTP_PORT: "3000"
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Viewer
+      GF_DASHBOARDS_DEFAULT_HOME_DASHBOARD_PATH: /etc/grafana/dashboards/boxes.json
+      GF_ANALYTICS_REPORTING_ENABLED: "false"
+      GF_ANALYTICS_CHECK_FOR_UPDATES: "false"
+      GF_ANALYTICS_CHECK_FOR_PLUGIN_UPDATES: "false"
+      GF_NEWS_NEWS_FEED_ENABLED: "false"
+    volumes:
+      - ./grafana/provisioning:/etc/grafana/provisioning:ro,Z
+      - ./grafana/dashboards:/etc/grafana/dashboards:ro,Z
+      - grafana-data:/var/lib/grafana
+
+volumes:
+  prometheus-data:
+  grafana-data:
