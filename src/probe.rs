@@ -66,23 +66,32 @@ impl Probe {
 
         let payload = many.concat();
         let ch = self.new_channel().await?;
-        if self.timed("copy_n_boxes", self.copy(&ch, &payload)).await {
-            self.timed("read_copied_boxes", self.read_bytes(&ch, &payload)).await;
-        }
+        let start = Instant::now();
+        let r = match self.copy(&ch, &payload).await {
+            Ok(()) => {
+                let d = start.elapsed();
+                self.read_bytes(&ch, &payload).await.map(|()| d)
+            }
+            Err(e) => Err(e),
+        };
+        self.report("copy_n_boxes", r);
         Ok(())
     }
 
     async fn timed(&self, op: &str, f: impl Future<Output = Result<(), Error>>) -> bool {
         let start = Instant::now();
-        let r = f.await;
-        let d = start.elapsed();
+        let r = f.await.map(|()| start.elapsed());
+        self.report(op, r)
+    }
+
+    fn report(&self, op: &str, r: Result<Duration, Error>) -> bool {
         match &r {
-            Ok(()) => {
+            Ok(d) => {
                 log::info!("{op}: {d:.1?}");
-                self.metrics.record(op, Ok(d));
+                self.metrics.record(op, Ok(*d));
             }
             Err(e) => {
-                log::warn!("{op}: failed after {d:.1?}: {e:?}");
+                log::warn!("{op}: failed: {e:?}");
                 self.metrics.record(op, Err(&e.label()));
             }
         }
@@ -150,7 +159,8 @@ impl Probe {
     }
 
     /// Writes `payload` into `dest` with the COPY command: the boxes go to a
-    /// temporary channel and the courier copies them into `dest`.
+    /// temporary channel and the courier copies them into `dest`. The copied
+    /// boxes are checked afterwards; that read is not part of the timing.
     async fn copy(&self, dest: &Channel, payload: &[u8]) -> Result<(), Error> {
         let envelopes = self
             .client

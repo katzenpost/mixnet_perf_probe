@@ -398,7 +398,7 @@
     {
       "type": "timeseries",
       "title": "Write n boxes, read n boxes, write n boxes with COPY",
-      "description": "write_n_boxes: n boxes written one after another. read_n_boxes: reading them back. copy_n_boxes: the same payload written to a temporary channel and copied into the destination by the courier, until the copy command completed. read_copied_boxes: reading the copied payload.",
+      "description": "write_n_boxes: n boxes written one after another. read_n_boxes: reading them back. copy_n_boxes: the same payload written to a temporary channel and copied into the destination by the courier, until the copy command completed.",
       "targets": [
         {
           "expr": "mpp_last_duration_seconds{op=\"write_n_boxes\"}",
@@ -426,15 +426,6 @@
             "uid": "prometheus"
           },
           "refId": "C"
-        },
-        {
-          "expr": "mpp_last_duration_seconds{op=\"read_copied_boxes\"}",
-          "legendFormat": "read_copied_boxes",
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "refId": "D"
         }
       ],
       "fieldConfig": {
@@ -500,21 +491,6 @@
                 "value": {
                   "mode": "fixed",
                   "fixedColor": "#199e70"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "read_copied_boxes"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "mode": "fixed",
-                  "fixedColor": "#c98500"
                 }
               }
             ]
@@ -615,17 +591,6 @@
           "instant": true,
           "range": false,
           "refId": "E"
-        },
-        {
-          "expr": "histogram_quantile(0.5, clamp_min(sum by (le) (mpp_duration_seconds_bucket{op=\"read_copied_boxes\"}) - (sum by (le) (mpp_duration_seconds_bucket{op=\"read_copied_boxes\"} offset $__range) or sum by (le) (mpp_duration_seconds_bucket{op=\"read_copied_boxes\"}) * 0), 0))",
-          "legendFormat": "read_copied_boxes",
-          "datasource": {
-            "type": "prometheus",
-            "uid": "prometheus"
-          },
-          "instant": true,
-          "range": false,
-          "refId": "F"
         }
       ],
       "fieldConfig": {
@@ -712,21 +677,6 @@
                 }
               }
             ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "read_copied_boxes"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "mode": "fixed",
-                  "fixedColor": "#c98500"
-                }
-              }
-            ]
           }
         ]
       },
@@ -765,7 +715,7 @@
       "description": "",
       "targets": [
         {
-          "expr": "clamp_min(sum by (op) (mpp_ops_total{op=~\"write_box|read_box|write_n_boxes|read_n_boxes|copy_n_boxes|read_copied_boxes\",result=\"ok\"}) - (sum by (op) (mpp_ops_total{op=~\"write_box|read_box|write_n_boxes|read_n_boxes|copy_n_boxes|read_copied_boxes\",result=\"ok\"} offset $__range) or sum by (op) (mpp_ops_total{op=~\"write_box|read_box|write_n_boxes|read_n_boxes|copy_n_boxes|read_copied_boxes\",result=\"ok\"}) * 0), 0) / clamp_min(sum by (op) (mpp_ops_total{op=~\"write_box|read_box|write_n_boxes|read_n_boxes|copy_n_boxes|read_copied_boxes\"}) - (sum by (op) (mpp_ops_total{op=~\"write_box|read_box|write_n_boxes|read_n_boxes|copy_n_boxes|read_copied_boxes\"} offset $__range) or sum by (op) (mpp_ops_total{op=~\"write_box|read_box|write_n_boxes|read_n_boxes|copy_n_boxes|read_copied_boxes\"}) * 0), 0)",
+          "expr": "clamp_min(sum by (op) (mpp_ops_total{op=~\"write_box|read_box|write_n_boxes|read_n_boxes|copy_n_boxes\",result=\"ok\"}) - (sum by (op) (mpp_ops_total{op=~\"write_box|read_box|write_n_boxes|read_n_boxes|copy_n_boxes\",result=\"ok\"} offset $__range) or sum by (op) (mpp_ops_total{op=~\"write_box|read_box|write_n_boxes|read_n_boxes|copy_n_boxes\",result=\"ok\"}) * 0), 0) / clamp_min(sum by (op) (mpp_ops_total{op=~\"write_box|read_box|write_n_boxes|read_n_boxes|copy_n_boxes\"}) - (sum by (op) (mpp_ops_total{op=~\"write_box|read_box|write_n_boxes|read_n_boxes|copy_n_boxes\"} offset $__range) or sum by (op) (mpp_ops_total{op=~\"write_box|read_box|write_n_boxes|read_n_boxes|copy_n_boxes\"}) * 0), 0)",
           "legendFormat": "{{op}}",
           "datasource": {
             "type": "prometheus",

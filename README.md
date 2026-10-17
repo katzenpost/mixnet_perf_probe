@@ -14,9 +14,10 @@ sleeps for an hour, and repeats. Each cycle uses fresh channels and times:
 | `write_n_boxes` | writing n boxes into one channel, one after another |
 | `read_n_boxes` | reading those n boxes back |
 | `copy_n_boxes` | writing the same n boxes' worth of data with the COPY command: the boxes go to a temporary channel, then the courier copies them into the destination channel |
-| `read_copied_boxes` | reading the copied data from the destination channel |
 
-Every read is checked against what was written.
+Every read is checked against what was written. The data written with COPY
+is read back and checked too, but that read is not timed: reads of copied
+boxes are no different from other reads.
 
 ## Running
 
