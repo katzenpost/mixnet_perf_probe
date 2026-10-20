@@ -1,0 +1,11 @@
+global:
+  scrape_interval: 60s
+  evaluation_interval: 60s
+
+scrape_configs:
+  - job_name: mixnet_perf_probe
+    static_configs:
+      - targets: ["127.0.0.1:9810"]
+  - job_name: kpclientd
+    static_configs:
+      - targets: ["127.0.0.1:9811"]
